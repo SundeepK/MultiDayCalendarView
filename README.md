@@ -1,53 +1,5 @@
 # MultiDayCalendarView
 
-<<<<<<< HEAD
-=======
-![ScreenShot](https://github.com/SundeepK/CompactCalendarView/blob/master/images/compact-calendar-view-example.png)
-
-# Locale specific settings
-It's possible to set the locale so that weekday column names are automatically set by the calendar.
-```java
-        CompactCalendarView compactCalendarView = (CompactCalendarView) findViewById(R.id.compactcalendar_view);
-        compactCalendarView.drawSmallIndicatorForEvents(true);
-        compactCalendarView.setLocale(Locale.CHINESE);
-        compactCalendarView.setUseThreeLetterAbbreviation(true);
-```
-![ScreenShot](https://github.com/SundeepK/CompactCalendarView/blob/master/images/chinese-locale-daynames.png)
-
-# Example usage
-It is possible to change the apreance of the view via a few properties. This includes the background color, text color, textsize color of the current day and the color of the first day of the month.
-
-```xml
-    <com.github.sundeepk.compactcalendarview.CompactCalendarView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/compactcalendar_view"
-        android:layout_width="fill_parent"
-        android:paddingRight="10dp"
-        android:paddingLeft="10dp"
-        android:layout_height="250dp"
-        app:compactCalendarTextSize="12sp"
-        app:compactCalendarBackgroundColor="#ffe95451"
-        app:compactCalendarTextColor="#fff"
-        app:compactCalendarFirstDayOfMonthBackgroundColor="#E57373"
-        app:compactCalendarCurrentDayBackgroundColor="#B71C1C"
-        />
-```
-```gradle
-dependencies {
-    compile 'com.github.sundeepk:compact-calendar-view:1.7.3'
-}
-
-```
-
-Please let me know if you are using this in your app so that I can add you as a list of users in the readme :).
-
-TODO:
-* Make drawing calendar more efficient by drawing all in one loop (currently requires 3).
-* Make drawing circles on current/first day based on width/height for each cell and remove any magic numbers there.
-* Benchmark code and add results on readme. 
- 
-```
->>>>>>> f131cb0ce22017b7af68766123c7e9134f2abf38
 The MIT License (MIT)
 
 Copyright (c) [2015] [Sundeepk]
