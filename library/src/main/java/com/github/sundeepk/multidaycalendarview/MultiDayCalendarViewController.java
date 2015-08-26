@@ -9,7 +9,6 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.support.v4.view.GestureDetectorCompat;
 import android.text.TextPaint;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.OverScroller;
@@ -384,7 +383,6 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         }
 
         float scrolledHour = Math.abs(accumulatedScrollOffset.y / timeTextHeight);
-        Log.d("multiday", "hour " + scrolledHour);
 
         //create a window for which events can be drawn. Prevents unnecessary event rects being drawn.
         long startTime = startDateTime.getTime() / 1000;
