@@ -19,7 +19,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final MultiDayCalendarView multiDayCalendarView = (MultiDayCalendarView) findViewById(R.id.multiday_calendar_view);
-        multiDayCalendarView.setCalenderListener(new MultiDayCalendarView.CalenderListener() {
+        multiDayCalendarView.setCalendarListener(new MultiDayCalendarView.MultiDayCalendarListener() {
             @Override
             public void onNewEventCreate(long eventStartDateTime) {
                 multiDayCalendarView.addEvent(eventStartDateTime, new Event<>("Some awesome thiiiiiiiiiinnng event name", "some data to hold", Color.parseColor("#43A047")));
@@ -31,7 +31,7 @@ public class MainActivity extends ActionBarActivity {
             }
 
             @Override
-            public void onCalenderScroll(Date firstDateTimeShownInCalenderView) {
+            public void onCalendarScroll(Date firstDateTimeShownInCalendarView) {
 
             }
         });

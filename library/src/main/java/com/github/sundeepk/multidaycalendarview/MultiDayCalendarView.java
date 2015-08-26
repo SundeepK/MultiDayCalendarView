@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.v4.view.GestureDetectorCompat;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -55,10 +56,10 @@ public class MultiDayCalendarView extends View {
         }
     };
 
-    public interface CalenderListener {
+    public interface MultiDayCalendarListener {
        public void onNewEventCreate(long eventStartDateTime);
        public void onEventSelect(long eventStartDateTime, Event selectedEvent);
-       public void onCalenderScroll(Date firstDateTimeShownInCalenderView);
+       public void onCalendarScroll(Date firstDateTimeShownInCalendarView);
     }
 
     public MultiDayCalendarView(Context context) {
@@ -74,13 +75,13 @@ public class MultiDayCalendarView extends View {
         init();
     }
 
-    public void setCalenderListener(CalenderListener listener){
-        multiDayCalendarViewController.setCalenderListener(listener);
+    public void setCalendarListener(MultiDayCalendarListener listener){
+        multiDayCalendarViewController.setMultiDayCalendarListener(listener);
     }
 
     private void init() {
         OverScroller scroller = new OverScroller(getContext(), new DecelerateInterpolator());
-        multiDayCalendarViewController = new MultiDayCalendarViewController(new Paint(), new Paint(), new Paint(), scroller, new RectF(), new Rect());
+        multiDayCalendarViewController = new MultiDayCalendarViewController(new Paint(), new Paint(), new TextPaint(), scroller, new RectF(), new Rect());
         gestureDetector = new GestureDetectorCompat(getContext(), gestureListener);
     }
 
