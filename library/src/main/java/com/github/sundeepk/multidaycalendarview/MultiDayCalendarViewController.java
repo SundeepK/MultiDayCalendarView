@@ -32,7 +32,6 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     private static final int SECS_IN_DAY = 86400;
     private static final int SECS_IN_HOUR = 60 * 60;
     private static final int EVENT_PADDING = 5;
-    private int currentFlingDirection;
     private static final int SWIPE_MIN_DISTANCE = 50;
     private static final int SWIPE_MAX_OFF_PATH = 50;
     private static final int SWIPE_THRESHOLD_VELOCITY = 100;
@@ -42,7 +41,6 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     private TextPaint eventsPaint;
     private OverScroller scroller;
     private PointF accumulatedScrollOffset = new PointF(0f, 0f);
-    private int currentScrollDirection = NONE;
     private Locale locale = Locale.getDefault();
     private Calendar currentCalendar = Calendar.getInstance(locale);
     private Date currentDate = new Date();
@@ -50,6 +48,8 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     private Rect timeColumnRect = new Rect();
     private MultiDayCalendarView.MultiDayCalendarListener multiDayCalendarListener;
 
+    private int currentFlingDirection;
+    private int currentScrollDirection = NONE;
     private int timeTextWidth;
     private int timeTextHeight;
     private int headerTextTopPadding;
