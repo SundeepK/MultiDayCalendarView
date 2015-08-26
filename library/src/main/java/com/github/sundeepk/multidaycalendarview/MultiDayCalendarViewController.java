@@ -24,12 +24,15 @@ import java.util.concurrent.TimeUnit;
 
 public class MultiDayCalendarViewController implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
 
+    private static final int NONE = 0;
+    private static final int HORIZONTAL = 1;
+    private static final int VERTICAL = 2;
     private static final int TIME_COLUMN_PADDING = 80;
     private static final int HEADER_HEIGHT = 200;
     private static final int SECS_IN_DAY = 86400;
     private static final int SECS_IN_HOUR = 60 * 60;
     private static final int EVENT_PADDING = 5;
-    private Direction currentFlingDirection;
+    private int currentFlingDirection;
     private static final int SWIPE_MIN_DISTANCE = 50;
     private static final int SWIPE_MAX_OFF_PATH = 50;
     private static final int SWIPE_THRESHOLD_VELOCITY = 100;
@@ -39,7 +42,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     private TextPaint eventsPaint;
     private OverScroller scroller;
     private PointF accumulatedScrollOffset = new PointF(0f, 0f);
-    private Direction currentScrollDirection = Direction.NONE;
+    private int currentScrollDirection = NONE;
     private Locale locale = Locale.getDefault();
     private Calendar currentCalendar = Calendar.getInstance(locale);
     private Date currentDate = new Date();
@@ -144,13 +147,13 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         isFling = false;
-        if (currentScrollDirection == Direction.NONE) {
+        if (currentScrollDirection == NONE) {
             if (Math.abs(distanceX) > Math.abs(distanceY)) {
-                currentScrollDirection = Direction.HORIZONTAL;
-                currentFlingDirection = Direction.HORIZONTAL;
+                currentScrollDirection = HORIZONTAL;
+                currentFlingDirection = HORIZONTAL;
             } else {
-                currentScrollDirection = Direction.VERTICAL;
-                currentFlingDirection = Direction.VERTICAL;
+                currentScrollDirection = VERTICAL;
+                currentFlingDirection = VERTICAL;
             }
         }
 
@@ -213,7 +216,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     }
 
     private void calculateXAxisOffset() {
-        if (!isFingerLifted && currentScrollDirection == Direction.HORIZONTAL) {
+        if (!isFingerLifted && currentScrollDirection == HORIZONTAL) {
             accumulatedScrollOffset.x -= distanceX;
         }
     }
@@ -223,7 +226,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         if (Math.abs(accumulatedScrollOffset.y - distanceY) > prevDiff) {
             isUp = true;
         }
-        if (currentScrollDirection == Direction.VERTICAL) {
+        if (currentScrollDirection == VERTICAL) {
             if (accumulatedScrollOffset.y - distanceY > 0) {
                 accumulatedScrollOffset.y = 0;
             } else if (accumulatedScrollOffset.y - distanceY < minScrollAllowed) {
@@ -470,7 +473,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     // return true whether scroll is happening
     public boolean computeScroll() {
         if (scroller.computeScrollOffset()) {
-            if (currentFlingDirection == Direction.VERTICAL) {
+            if (currentFlingDirection == VERTICAL) {
                 accumulatedScrollOffset.y = scroller.getCurrY();
             } else {
                 accumulatedScrollOffset.x = scroller.getCurrX();
@@ -483,19 +486,19 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     // returns true whether an event it was interested in happened
     protected boolean onTouchEvent(MotionEvent event, GestureDetectorCompat gestureDetectorCompat) {
         if (event.getAction() == MotionEvent.ACTION_UP) {
-            if (currentScrollDirection == Direction.HORIZONTAL) {
+            if (currentScrollDirection == HORIZONTAL) {
                 daysScrolledSoFar = Math.round(accumulatedScrollOffset.x / (widthPerDay));
                 float remainingScrollAfterFingerLifted = (accumulatedScrollOffset.x - daysScrolledSoFar * (widthPerDay));
                 scroller.startScroll((int) accumulatedScrollOffset.x, 0, (int) -remainingScrollAfterFingerLifted, 0);
-                currentScrollDirection = Direction.NONE;
+                currentScrollDirection = NONE;
                 if(multiDayCalendarListener != null){
                     currentCalendar.setTime(currentDate);
                     plusDays(-daysScrolledSoFar);
                     multiDayCalendarListener.onCalendarScroll(currentCalendar.getTime());
                 }
                 return true;
-            }else if(currentScrollDirection == Direction.VERTICAL){
-                currentScrollDirection = Direction.NONE;
+            }else if(currentScrollDirection == VERTICAL){
+                currentScrollDirection = NONE;
                 return gestureDetectorCompat.onTouchEvent(event);
             }
         }
@@ -506,10 +509,6 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         currentCalendar.setTime(currentDate);
         plusDays(-daysScrolledSoFar);
         return currentCalendar.getTime();
-    }
-
-    private enum Direction {
-        NONE, HORIZONTAL, VERTICAL
     }
 
     void addEvents(Map<Long, Event<?>> eventsToAdd) {
