@@ -5,8 +5,12 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.support.v4.view.GestureDetectorCompat;
+import android.text.TextPaint;
 import android.view.MotionEvent;
 import android.widget.OverScroller;
+
+import com.github.sundeepk.multidaycalendarview.domain.Event;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atMost;
@@ -27,7 +32,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CalendarControllerTest {
+public class MultiDayCalendarViewControllerTest {
 
     private static final float HEADER_HEIGHT = 200;
     private static final float TIME_COLUMN_PADDING = 80;
@@ -44,12 +49,15 @@ public class CalendarControllerTest {
 
     @Mock private Paint dayHourSeparatorPaint;
     @Mock private Paint timeColumnPaint;
-    @Mock private Paint eventsPaint;
+    @Mock private TextPaint eventsPaint;
     @Mock private OverScroller overScroller;
     @Mock private Canvas canvas;
     @Mock private MotionEvent event;
     @Mock private RectF measureTextSizeRect;
     @Mock private Rect textRect;
+    @Mock private MotionEvent motionEvent;
+    @Mock private GestureDetectorCompat gestureDetectorCompat;
+    @Mock private MultiDayCalendarView.MultiDayCalendarListener listener;
 
     private MultiDayCalendarViewController underTest;
     private int timeTextWidth = 0;
@@ -68,22 +76,22 @@ public class CalendarControllerTest {
 
     @Test
     public void itDrawsDayHeaderAndTimeColumn() {
-        Calendar currentCalender =  Calendar.getInstance();
-        currentCalender.set(Calendar.HOUR_OF_DAY, 0);
-        currentCalender.set(Calendar.MINUTE, 0);
-        currentCalender.set(Calendar.SECOND, 0);
-        currentCalender.set(Calendar.MILLISECOND, 0);
+        Calendar currentCalendar =  Calendar.getInstance();
+        currentCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        currentCalendar.set(Calendar.MINUTE, 0);
+        currentCalendar.set(Calendar.SECOND, 0);
+        currentCalendar.set(Calendar.MILLISECOND, 0);
 
         List<Date> dates = new ArrayList<>();
         List<String> hoursWithAmPm = new ArrayList<>();
 
         for(int day = -NUMBER_DAYS_VISIBLE; day < (NUMBER_DAYS_VISIBLE * 2); day++){
-            currentCalender.set(Calendar.HOUR_OF_DAY, 0);
-            currentCalender.set(Calendar.MINUTE, 0);
-            currentCalender.set(Calendar.SECOND, 0);
-            currentCalender.set(Calendar.MILLISECOND, 0);
-            currentCalender.add(Calendar.DATE, 1);
-            dates.add(currentCalender.getTime());
+            currentCalendar.set(Calendar.HOUR_OF_DAY, 0);
+            currentCalendar.set(Calendar.MINUTE, 0);
+            currentCalendar.set(Calendar.SECOND, 0);
+            currentCalendar.set(Calendar.MILLISECOND, 0);
+            currentCalendar.add(Calendar.DATE, 1);
+            dates.add(currentCalendar.getTime());
         }
 
         for (int hour = 1, day = -NUMBER_DAYS_VISIBLE; hour < 24; hour++) {
@@ -106,6 +114,37 @@ public class CalendarControllerTest {
             verify(canvas).drawText(eq(hoursWithAmPm.get(hour)), anyInt(), anyInt(), eq(timeColumnPaint));
         }
     }
+
+    @Test
+    public void testItAddsEvent(){
+        Event<String> event = new Event<>("Some test event", "Test data passed in", 100, true);
+        underTest.addEvent(1, event);
+        assertEquals(event, underTest.removeEvent(1));
+    }
+
+    @Test
+    public void testListenerIsCalledOnMonthScroll(){
+        //Sun, 01 Mar 2015 00:00:00 GMT
+        Date expectedDateOnScroll = new Date(1423440000000L);
+
+        when(motionEvent.getAction()).thenReturn(MotionEvent.ACTION_UP);
+
+        //Set width of view so that scrolling will return a correct value
+        underTest.onMeasure(720, 1080);
+
+        //Sun, 08 Feb 2015 00:00:00 GMT
+        underTest.gotoDate(new Date(1423353600000L));
+
+        underTest.setMultiDayCalendarListener(listener);
+
+        //Scroll enough to push calendar to next month
+        underTest.onScroll(motionEvent, motionEvent, 200, 0);
+        underTest.onDraw(canvas);
+        underTest.onTouchEvent(motionEvent, gestureDetectorCompat);
+        assertEquals(expectedDateOnScroll, underTest.getCurrentLeftMostDay());
+        verify(listener).onCalendarScroll(new Date(1423440000000L));
+    }
+
 
     private int getDayOfMonth(Date aDate) {
         Calendar cal = Calendar.getInstance();

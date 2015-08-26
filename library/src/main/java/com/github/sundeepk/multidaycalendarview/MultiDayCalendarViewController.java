@@ -9,7 +9,6 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.support.v4.view.GestureDetectorCompat;
 import android.text.TextPaint;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.OverScroller;
@@ -46,7 +45,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     private Date currentDate = new Date();
     private Map<Long, Event<?>> epochSecsToEvents = new HashMap<>();
     private Rect timeColumnRect = new Rect();
-    private MultiDayCalendarView.CalenderListener calenderListener;
+    private MultiDayCalendarView.MultiDayCalendarListener multiDayCalendarListener;
 
     private int timeTextWidth;
     private int timeTextHeight;
@@ -68,17 +67,17 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     private RectF helperRect;
     private int eventRectTextHeight;
 
-     MultiDayCalendarViewController(Paint dayHourSeparatorPaint, Paint timeColumnPaint, Paint eventsPaint, OverScroller scroller, RectF helperRect, Rect textRect) {
+     MultiDayCalendarViewController(Paint dayHourSeparatorPaint, Paint timeColumnPaint, TextPaint eventsPaint, OverScroller scroller, RectF helperRect, Rect textRect) {
         this.dayHourSeparatorPaint = dayHourSeparatorPaint;
         this.timeColumnPaint = timeColumnPaint;
-        this.eventsPaint = new TextPaint();
+        this.eventsPaint = eventsPaint;
         this.scroller = scroller;
         this.helperRect = helperRect;
         init(textRect);
     }
 
-    void setCalenderListener(MultiDayCalendarView.CalenderListener calenderListener){
-        this.calenderListener = calenderListener;
+    void setMultiDayCalendarListener(MultiDayCalendarView.MultiDayCalendarListener multiDayCalendarListener){
+        this.multiDayCalendarListener = multiDayCalendarListener;
     }
 
     @Override
@@ -87,16 +86,16 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
 
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
-        if(calenderListener != null ){
+        if(multiDayCalendarListener != null ){
             int hour = (int) ((e.getY() - HEADER_HEIGHT - accumulatedScrollOffset.y) / timeTextHeight);
             int day = Math.round((e.getX() / widthPerDay) - daysScrolledSoFar) - 1;
             currentCalendar.setTime(currentDate);
             plusHoursAndDays(hour, day);
             long eventStartTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(currentCalendar.getTimeInMillis());
             if(epochSecsToEvents.containsKey(eventStartTimeSeconds)){
-                calenderListener.onEventSelect(eventStartTimeSeconds, epochSecsToEvents.get(eventStartTimeSeconds));
+                multiDayCalendarListener.onEventSelect(eventStartTimeSeconds, epochSecsToEvents.get(eventStartTimeSeconds));
             }else{
-                calenderListener.onNewEventCreate(eventStartTimeSeconds);
+                multiDayCalendarListener.onNewEventCreate(eventStartTimeSeconds);
             }
         }
         return true;
@@ -384,7 +383,6 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         }
 
         float scrolledHour = Math.abs(accumulatedScrollOffset.y / timeTextHeight);
-        Log.d("multiday", "hour " + scrolledHour);
 
         //create a window for which events can be drawn. Prevents unnecessary event rects being drawn.
         long startTime = startDateTime.getTime() / 1000;
@@ -490,10 +488,10 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
                 float remainingScrollAfterFingerLifted = (accumulatedScrollOffset.x - daysScrolledSoFar * (widthPerDay));
                 scroller.startScroll((int) accumulatedScrollOffset.x, 0, (int) -remainingScrollAfterFingerLifted, 0);
                 currentScrollDirection = Direction.NONE;
-                if(calenderListener != null){
+                if(multiDayCalendarListener != null){
                     currentCalendar.setTime(currentDate);
                     plusDays(-daysScrolledSoFar);
-                    calenderListener.onCalenderScroll(currentCalendar.getTime());
+                    multiDayCalendarListener.onCalendarScroll(currentCalendar.getTime());
                 }
                 return true;
             }else if(currentScrollDirection == Direction.VERTICAL){
