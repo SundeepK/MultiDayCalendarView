@@ -22,7 +22,7 @@ public class MainActivity extends ActionBarActivity {
         multiDayCalendarView.setCalendarListener(new MultiDayCalendarView.MultiDayCalendarListener() {
             @Override
             public void onNewEventCreate(long eventStartDateTime) {
-                multiDayCalendarView.addEvent(eventStartDateTime, new Event<>("Some awesome thiiiiiiiiiinnng event name", "some data to hold", Color.parseColor("#43A047")));
+                multiDayCalendarView.addEvent(eventStartDateTime, new Event<>("Some awesome thiiiiiiiiiinnngfffffffffff event name cool story bro", "some data to hold", Color.parseColor("#43A047")));
             }
 
             @Override

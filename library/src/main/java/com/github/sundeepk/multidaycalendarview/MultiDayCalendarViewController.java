@@ -184,7 +184,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         eventsPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         eventsPaint.setTypeface(Typeface.DEFAULT_BOLD);
         eventsPaint.getTextBounds("00 PM", 0, "00 PM".length(), textRect);
-        eventRectTextHeight = textRect.height() + 5; // add some extra padding so that lines aren't drawn too close
+        eventRectTextHeight = textRect.height() + 7; // add some extra padding so that lines aren't drawn too close
 
         dayLines = new float[(numberOfVisibleDays) * 4 * 3];
         headerDayLines = new float[(numberOfVisibleDays) * 4 * 3];
@@ -395,7 +395,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
             startTime = tmp;
         }
         int maxNumberOfLines = (timeTextHeight / eventRectTextHeight) - 1; // minus 1 because we offset the drawing of text by eventRectTextHeight / 2
-        int padding = eventRectTextHeight / 2;
+        int padding = eventRectTextHeight / 3;
         for (Map.Entry<Long, Event<?>> events : epochSecsToEvents.entrySet()) {
             long timeInSeconds = events.getKey();
             if (timeInSeconds >= startTime && timeInSeconds <= endDate) {
@@ -420,6 +420,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     }
 
     private void drawEventText(Canvas canvas, int maxNumberOfLines, Event event, float dayX, float hourY) {
+        dayX += 2;
         String eventText = event.getEventName();
         int count =0;
         int start =0;
@@ -427,17 +428,22 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         eventsPaint.setColor(Color.WHITE);
         // line wrap the text to draw
         while (count < maxNumberOfLines && start < eventText.length()) {
-            int end = eventsPaint.breakText(eventText, start, eventText.length(), true, widthPerDay, null);
+            int end = eventsPaint.breakText(eventText, start, eventText.length(), true, widthPerDay - 10, null);
 
             if (end <= 0) {
                 canvas.drawText(eventText, start, start + end, dayX, hourY + heightOffset, eventsPaint);
                 break;
             }
 
-            int startOfCurrentWord = event.hasWhiteSpaceInEventName() ? getStartOfWordPos(eventText, start + end) : end;
+            int startOfCurrentWord =  getStartOfWordPos(eventText, start + end);
             int endOfCurrentWord = getEndOfWordPos(eventText, start + end);
 
-            if (endOfCurrentWord >= (start + end)) {
+
+            while(eventText.charAt(start) == ' '){
+                start++;
+            }
+
+            if (endOfCurrentWord >= (start + end) &&  startOfCurrentWord > start ) {
                 canvas.drawText(eventText, start, startOfCurrentWord, dayX, hourY + heightOffset, eventsPaint);
                 start = startOfCurrentWord;
             } else {
@@ -452,20 +458,28 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
 
     private int getEndOfWordPos(String eventText, int position) {
         int textLength = eventText.length();
-        if(position+1 < textLength && eventText.charAt(position) != ' '){
-            while(position < textLength && position > 0 && eventText.charAt(position + 1) != ' '){
-                position++;
+        while (position <= textLength && position > 0) {
+            if (position == textLength) {
+                return textLength;
             }
+
+            if (eventText.charAt(position) == ' ') {
+                break;
+            }
+
+            position++;
         }
         return position;
     }
 
     private int getStartOfWordPos(String eventText, int position) {
         int textLength = eventText.length();
-        if(position+1 < textLength && eventText.charAt(position) != ' '){
-            while(position < textLength && position > 0 && eventText.charAt(position - 1) != ' '){
-                position--;
+        while (position < textLength && position > 0) {
+            if (eventText.charAt(position) == ' ') {
+                break;
             }
+
+            position--;
         }
         return position;
     }
