@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <declare-styleable name="MultiDayCalendarView">
+        <attr name="multiDayCalendarEventTextSize" format="dimension"/>
+        <attr name="multiDayCalendarDateHeaderTextSize" format="dimension"/>
+    </declare-styleable>
 </resources>

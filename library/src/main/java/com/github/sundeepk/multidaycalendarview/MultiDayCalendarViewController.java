@@ -1,5 +1,7 @@
 package com.github.sundeepk.multidaycalendarview;
 
+import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -9,10 +11,13 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.support.v4.view.GestureDetectorCompat;
 import android.text.TextPaint;
+import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.OverScroller;
 
+import com.github.sundeepk.multidaycalendarview.R;
 import com.github.sundeepk.multidaycalendarview.domain.Event;
 
 import java.util.Calendar;
@@ -58,7 +63,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     private float distanceX;
     private float distanceY;
     private boolean isFling;
-    private int minScrollAllowed;
+    private int minYScrollAllowed;
     private float prevDiff;
     private boolean isFingerLifted;
     private float[] hourLines = new float[24 * 4];
@@ -69,13 +74,18 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     private int height;
     private RectF helperRect;
     private int eventRectTextHeight;
+    private int eventTextSize = 25;
+    private int dateHeaderTextSize = 25;
 
-     MultiDayCalendarViewController(Paint dayHourSeparatorPaint, Paint timeColumnPaint, TextPaint eventsPaint, OverScroller scroller, RectF helperRect, Rect textRect) {
+    MultiDayCalendarViewController(Paint dayHourSeparatorPaint, Paint timeColumnPaint,
+                                    TextPaint eventsPaint, OverScroller scroller, RectF helperRect,
+                                    Rect textRect, AttributeSet attrs, Context context) {
         this.dayHourSeparatorPaint = dayHourSeparatorPaint;
         this.timeColumnPaint = timeColumnPaint;
         this.eventsPaint = eventsPaint;
         this.scroller = scroller;
         this.helperRect = helperRect;
+        loadAttributes(attrs, context);
         init(textRect);
     }
 
@@ -135,10 +145,10 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         scroller.forceFinished(true);
             isFling = true;
         if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH) {
-            scroller.fling(0, (int) accumulatedScrollOffset.y, 0, (int) velocityY, 0, 0, minScrollAllowed, 0);
+            scroller.fling(0, (int) accumulatedScrollOffset.y, 0, (int) velocityY, 0, 0, minYScrollAllowed, 0);
 
         } else if (Math.abs(e2.getY() - e1.getY()) > SWIPE_MAX_OFF_PATH) {
-            scroller.fling(0, (int) accumulatedScrollOffset.y, 0, (int) velocityY, 0, 0, minScrollAllowed, 0);
+            scroller.fling(0, (int) accumulatedScrollOffset.y, 0, (int) velocityY, 0, 0, minYScrollAllowed, 0);
 
         }
         return true;
@@ -162,6 +172,20 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         return true;
     }
 
+    private void loadAttributes(AttributeSet attrs, Context context) {
+        if(attrs != null && context != null){
+            TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs,  R.styleable.MultiDayCalendarView, 0, 0);
+            try{
+                eventTextSize = typedArray.getDimensionPixelSize(R.styleable.MultiDayCalendarView_multiDayCalendarEventTextSize,
+                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, eventTextSize, context.getResources().getDisplayMetrics()));
+                dateHeaderTextSize = typedArray.getDimensionPixelSize(R.styleable.MultiDayCalendarView_multiDayCalendarDateHeaderTextSize,
+                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, eventTextSize, context.getResources().getDisplayMetrics()));
+            }finally{
+                typedArray.recycle();
+            }
+        }
+    }
+
     private void init(Rect textRect) {
         dayHourSeparatorPaint.setStyle(Paint.Style.STROKE);
         dayHourSeparatorPaint.setStrokeWidth(2);
@@ -170,7 +194,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         headerTextTopPadding = 60;
 
         timeColumnPaint.setTextAlign(Paint.Align.LEFT);
-        timeColumnPaint.setTextSize(25);
+        timeColumnPaint.setTextSize(dateHeaderTextSize);
         timeColumnPaint.getTextBounds("00 PM", 0, "00 PM".length(), textRect);
         timeTextHeight = textRect.height() * 6;
         timeTextWidth = (int) timeColumnPaint.measureText("00 PM");
@@ -180,7 +204,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
 
         eventsPaint.setStyle(Paint.Style.FILL);
         eventsPaint.setColor(Color.BLUE);
-        eventsPaint.setTextSize(25);
+        eventsPaint.setTextSize(eventTextSize);
         eventsPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         eventsPaint.setTypeface(Typeface.DEFAULT_BOLD);
         eventsPaint.getTextBounds("00 PM", 0, "00 PM".length(), textRect);
@@ -197,7 +221,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         int headerColumnWidth = timeTextWidth + padding * 2;
         widthPerDay = parentWidth - headerColumnWidth - padding * (numberOfVisibleDays);
         widthPerDay = widthPerDay / numberOfVisibleDays;
-        minScrollAllowed = -(timeTextHeight * 24 + HEADER_HEIGHT - parentHeight);
+        minYScrollAllowed = -(timeTextHeight * 24 + HEADER_HEIGHT - parentHeight);
     }
 
     protected void onDraw(Canvas canvas) {
@@ -229,8 +253,8 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         if (currentScrollDirection == VERTICAL) {
             if (accumulatedScrollOffset.y - distanceY > 0) {
                 accumulatedScrollOffset.y = 0;
-            } else if (accumulatedScrollOffset.y - distanceY < minScrollAllowed) {
-                accumulatedScrollOffset.y = minScrollAllowed;
+            } else if (accumulatedScrollOffset.y - distanceY < minYScrollAllowed) {
+                accumulatedScrollOffset.y = minYScrollAllowed;
             } else if (isFling && !isUp && (accumulatedScrollOffset.y - distanceY) > scroller.getFinalY()) {
                 accumulatedScrollOffset.y -= distanceY;
             } else if (isFling && isUp && (accumulatedScrollOffset.y - distanceY) < scroller.getFinalY()) {
@@ -533,6 +557,10 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         daysScrolledSoFar = 0;
         accumulatedScrollOffset.x = 0;
         distanceX = 0;
+    }
+
+    void setEventsMap(Map<Long, Event<?>> eventsMap){
+        this.epochSecsToEvents = eventsMap;
     }
 
 }

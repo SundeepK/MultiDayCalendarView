@@ -1,5 +1,6 @@
 package com.github.sundeepk.multidaycalendarview;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
@@ -7,6 +8,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.v4.view.GestureDetectorCompat;
 import android.text.TextPaint;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.OverScroller;
 
@@ -70,7 +72,8 @@ public class MultiDayCalendarViewControllerTest {
         when(measureTextSizeRect.height()).thenReturn(TEXT_HEIGHT);
         widthPerDay = widthPerDay / NUMBER_DAYS_VISIBLE;
         accumulatedScrollOffset = new PointF(0f, 0f);
-        underTest = new MultiDayCalendarViewController(dayHourSeparatorPaint, timeColumnPaint, eventsPaint, overScroller, measureTextSizeRect, textRect);
+        underTest = new MultiDayCalendarViewController(dayHourSeparatorPaint, timeColumnPaint,
+                eventsPaint, overScroller, measureTextSizeRect, textRect, null, null);
     }
 
 

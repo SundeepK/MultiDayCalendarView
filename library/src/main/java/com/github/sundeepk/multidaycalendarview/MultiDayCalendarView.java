@@ -72,16 +72,17 @@ public class MultiDayCalendarView extends View {
 
     public MultiDayCalendarView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context, attrs);
     }
 
     public void setCalendarListener(MultiDayCalendarListener listener){
         multiDayCalendarViewController.setMultiDayCalendarListener(listener);
     }
 
-    private void init() {
+    private void init(Context context, AttributeSet attrs) {
         OverScroller scroller = new OverScroller(getContext(), new DecelerateInterpolator());
-        multiDayCalendarViewController = new MultiDayCalendarViewController(new Paint(), new Paint(), new TextPaint(), scroller, new RectF(), new Rect());
+        multiDayCalendarViewController = new MultiDayCalendarViewController(new Paint(),
+                new Paint(), new TextPaint(), scroller, new RectF(), new Rect(), attrs, context);
         gestureDetector = new GestureDetectorCompat(getContext(), gestureListener);
     }
 
@@ -146,6 +147,10 @@ public class MultiDayCalendarView extends View {
 
     public Date getCurrentLeftMostDay(){
         return multiDayCalendarViewController.getCurrentLeftMostDay();
+    }
+
+    public void setEventMap(){
+
     }
 
 }

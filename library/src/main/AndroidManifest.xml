@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.github.sundeepk.compactcalendarview">
+          package="com.github.sundeepk.multidaycalendarview">
 
     <application android:allowBackup="true"></application>
 
