@@ -173,17 +173,17 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     }
 
     private void loadAttributes(AttributeSet attrs, Context context) {
-        if(attrs != null && context != null){
-            TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs,  R.styleable.MultiDayCalendarView, 0, 0);
-            try{
-                eventTextSize = typedArray.getDimensionPixelSize(R.styleable.MultiDayCalendarView_multiDayCalendarEventTextSize,
-                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, eventTextSize, context.getResources().getDisplayMetrics()));
-                dateHeaderTextSize = typedArray.getDimensionPixelSize(R.styleable.MultiDayCalendarView_multiDayCalendarDateHeaderTextSize,
-                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, eventTextSize, context.getResources().getDisplayMetrics()));
-            }finally{
-                typedArray.recycle();
-            }
-        }
+//        if(attrs != null && context != null){
+//            TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs,  R.styleable.MultiDayCalendarView, 0, 0);
+//            try{
+//                eventTextSize = typedArray.getDimensionPixelSize(R.styleable.MultiDayCalendarView_multiDayCalendarEventTextSize,
+//                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, eventTextSize, context.getResources().getDisplayMetrics()));
+//                dateHeaderTextSize = typedArray.getDimensionPixelSize(R.styleable.MultiDayCalendarView_multiDayCalendarDateHeaderTextSize,
+//                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, dateHeaderTextSize, context.getResources().getDisplayMetrics()));
+//            }finally{
+//                typedArray.recycle();
+//            }
+//        }
     }
 
     private void init(Rect textRect) {
@@ -219,7 +219,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         height = parentHeight;
         int padding = 10;
         int headerColumnWidth = timeTextWidth + padding * 2;
-        widthPerDay = parentWidth - headerColumnWidth - padding * (numberOfVisibleDays);
+        widthPerDay = parentWidth - timeTextWidth;
         widthPerDay = widthPerDay / numberOfVisibleDays;
         minYScrollAllowed = -(timeTextHeight * 24 + HEADER_HEIGHT - parentHeight);
     }

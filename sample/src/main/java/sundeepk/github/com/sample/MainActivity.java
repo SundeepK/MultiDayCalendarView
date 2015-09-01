@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import com.github.sundeepk.multidaycalendarview.MultiDayCalendarView;
 import com.github.sundeepk.multidaycalendarview.domain.Event;
 
+import java.util.Calendar;
 import java.util.Date;
 
 
@@ -35,6 +36,22 @@ public class MainActivity extends ActionBarActivity {
 
             }
         });
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.getTime();
+
+        cal.add(Calendar.HOUR_OF_DAY, 1);
+        multiDayCalendarView.addEvent(cal.getTimeInMillis(), new Event<>("Some awesome thiiiiiiiiiinnngfffffffffff a aa  a a a aa a a a a a a", "some data to hold", Color.parseColor("#43A047")));
+
+        cal.add(Calendar.HOUR_OF_DAY, 1);
+        multiDayCalendarView.addEvent(cal.getTimeInMillis(), new Event<>("Some awesome thiiiiiiiiiinnngfffffffffff somethingalsoverylongtotestwith", "some data to hold", Color.parseColor("#43A047")));
+
+        cal.add(Calendar.HOUR_OF_DAY, 1);
+        multiDayCalendarView.addEvent(cal.getTimeInMillis(), new Event<>("Some awesome thiiiiiiiiiinnngfffffffffff 11111112222211 11223344334", "some data to hold", Color.parseColor("#43A047")));
     }
 
     @Override
