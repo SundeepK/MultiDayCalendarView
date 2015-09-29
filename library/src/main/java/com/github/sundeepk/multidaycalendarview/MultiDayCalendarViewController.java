@@ -17,7 +17,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.OverScroller;
 
-import com.github.sundeepk.multidaycalendarview.R;
 import com.github.sundeepk.multidaycalendarview.domain.Event;
 
 import java.util.Calendar;
@@ -74,8 +73,8 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     private int height;
     private RectF helperRect;
     private int eventRectTextHeight;
-    private int eventTextSize = 25;
-    private int dateHeaderTextSize = 25;
+    private int eventTextSize = 13;
+    private int dateHeaderTextSize = 14;
 
     MultiDayCalendarViewController(Paint dayHourSeparatorPaint, Paint timeColumnPaint,
                                     TextPaint eventsPaint, OverScroller scroller, RectF helperRect,
@@ -173,17 +172,17 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     }
 
     private void loadAttributes(AttributeSet attrs, Context context) {
-//        if(attrs != null && context != null){
-//            TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs,  R.styleable.MultiDayCalendarView, 0, 0);
-//            try{
-//                eventTextSize = typedArray.getDimensionPixelSize(R.styleable.MultiDayCalendarView_multiDayCalendarEventTextSize,
-//                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, eventTextSize, context.getResources().getDisplayMetrics()));
-//                dateHeaderTextSize = typedArray.getDimensionPixelSize(R.styleable.MultiDayCalendarView_multiDayCalendarDateHeaderTextSize,
-//                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, dateHeaderTextSize, context.getResources().getDisplayMetrics()));
-//            }finally{
-//                typedArray.recycle();
-//            }
-//        }
+        if(attrs != null && context != null){
+            TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs,  R.styleable.MultiDayCalendarView, 0, 0);
+            try{
+                eventTextSize = typedArray.getDimensionPixelSize(R.styleable.MultiDayCalendarView_multiDayCalendarEventTextSize,
+                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, eventTextSize, context.getResources().getDisplayMetrics()));
+                dateHeaderTextSize = typedArray.getDimensionPixelSize(R.styleable.MultiDayCalendarView_multiDayCalendarDateHeaderTextSize,
+                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, dateHeaderTextSize, context.getResources().getDisplayMetrics()));
+            }finally{
+                typedArray.recycle();
+            }
+        }
     }
 
     private void init(Rect textRect) {
@@ -435,7 +434,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
                 eventsPaint.setColor(event.getColor());
                 helperRect.left = dayX + EVENT_PADDING;
                 helperRect.top = hour;
-                helperRect.right = (dayX + widthPerDay);
+                helperRect.right = (dayX + widthPerDay - 1);
                 helperRect.bottom = (hour + timeTextHeight) - EVENT_PADDING;
                 canvas.drawRoundRect(helperRect, 6, 6, eventsPaint);
                 drawEventText(canvas, maxNumberOfLines, event, helperRect.left, helperRect.top + (eventRectTextHeight + padding));
