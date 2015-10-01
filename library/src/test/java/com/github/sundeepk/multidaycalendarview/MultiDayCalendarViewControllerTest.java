@@ -1,6 +1,5 @@
 package com.github.sundeepk.multidaycalendarview;
 
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
@@ -8,7 +7,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.v4.view.GestureDetectorCompat;
 import android.text.TextPaint;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.OverScroller;
 
@@ -26,6 +24,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
@@ -123,6 +123,15 @@ public class MultiDayCalendarViewControllerTest {
         Event<String> event = new Event<>("Some test event", "Test data passed in", 100, true);
         underTest.addEvent(1, event);
         assertEquals(event, underTest.removeEvent(1));
+    }
+
+    @Test
+    public void testItRemovesEvent(){
+        Event<String> event = new Event<>("Some test event", "Test data passed in", 100, true);
+        underTest.addEvent(1, event);
+        assertTrue(underTest.containsEvent(1));
+        underTest.removeEvent(1);
+        assertFalse(underTest.containsEvent(1));
     }
 
     @Test

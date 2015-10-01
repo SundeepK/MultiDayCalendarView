@@ -12,6 +12,7 @@ import android.graphics.Typeface;
 import android.support.v4.view.GestureDetectorCompat;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.LongSparseArray;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -21,7 +22,6 @@ import com.github.sundeepk.multidaycalendarview.domain.Event;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -48,7 +48,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     private Locale locale = Locale.getDefault();
     private Calendar currentCalendar = Calendar.getInstance(locale);
     private Date currentDate = new Date();
-    private Map<Long, Event<?>> epochSecsToEvents = new HashMap<>();
+    private LongSparseArray<Event<?>> epochSecsToEvents = new LongSparseArray<>();
     private Rect timeColumnRect = new Rect();
     private MultiDayCalendarView.MultiDayCalendarListener multiDayCalendarListener;
 
@@ -104,8 +104,9 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
             currentCalendar.setTime(currentDate);
             plusHoursAndDays(hour, day);
             long eventStartTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(currentCalendar.getTimeInMillis());
-            if(epochSecsToEvents.containsKey(eventStartTimeSeconds)){
-                multiDayCalendarListener.onEventSelect(eventStartTimeSeconds, epochSecsToEvents.get(eventStartTimeSeconds));
+            Event<?> event = epochSecsToEvents.get(eventStartTimeSeconds);
+            if(event != null){
+                multiDayCalendarListener.onEventSelect(eventStartTimeSeconds, event);
             }else{
                 multiDayCalendarListener.onNewEventCreate(eventStartTimeSeconds);
             }
@@ -419,10 +420,11 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         }
         int maxNumberOfLines = (timeTextHeight / eventRectTextHeight) - 1; // minus 1 because we offset the drawing of text by eventRectTextHeight / 2
         int padding = eventRectTextHeight / 3;
-        for (Map.Entry<Long, Event<?>> events : epochSecsToEvents.entrySet()) {
-            long timeInSeconds = events.getKey();
+
+        for(int i = 0; i < epochSecsToEvents.size(); i++){
+            long timeInSeconds = epochSecsToEvents.keyAt(i);
             if (timeInSeconds >= startTime && timeInSeconds <= endDate) {
-                Event event = events.getValue();
+                Event event = epochSecsToEvents.valueAt(i);
                 long difference;
                 if (timeInSeconds > startTime) {
                     difference = (timeInSeconds - startTime);
@@ -549,7 +551,9 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     }
 
     void addEvents(Map<Long, Event<?>> eventsToAdd) {
-        this.epochSecsToEvents.putAll(eventsToAdd);
+        for(Map.Entry<Long, Event<?>> entry : eventsToAdd.entrySet()){
+            this.epochSecsToEvents.put(entry.getKey(), entry.getValue());
+        }
     }
 
     void addEvent(long epochTimeInSecsToTheClosetHour, Event event){
@@ -557,11 +561,13 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     }
 
     Event removeEvent(long epochTimeInSecsToTheClosetHour){
-        return this.epochSecsToEvents.remove(epochTimeInSecsToTheClosetHour);
+        Event<?> event = this.epochSecsToEvents.get(epochTimeInSecsToTheClosetHour);
+        epochSecsToEvents.remove(epochTimeInSecsToTheClosetHour);
+        return event;
     }
 
     boolean containsEvent(long epochTimeInSecsToTheClosetHour){
-        return this.epochSecsToEvents.containsKey(epochTimeInSecsToTheClosetHour);
+        return this.epochSecsToEvents.get(epochTimeInSecsToTheClosetHour) != null;
     }
 
     void gotoDate(Date dateToGoTo){
@@ -570,10 +576,6 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         daysScrolledSoFar = 0;
         accumulatedScrollOffset.x = 0;
         distanceX = 0;
-    }
-
-    void setEventsMap(Map<Long, Event<?>> eventsMap){
-        this.epochSecsToEvents = eventsMap;
     }
 
 }
