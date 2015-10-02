@@ -17,7 +17,9 @@ import android.widget.OverScroller;
 import com.github.sundeepk.multidaycalendarview.domain.Event;
 
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class MultiDayCalendarView extends View {
 
@@ -73,6 +75,14 @@ public class MultiDayCalendarView extends View {
     public MultiDayCalendarView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs);
+    }
+
+    public void setLocale(Locale locale){
+        multiDayCalendarViewController.setLocale(locale);
+    }
+
+    public void setTimeZoneAndLocale(TimeZone timeZone, Locale locale){
+        multiDayCalendarViewController.setTimeZoneAndLocale(timeZone, locale);
     }
 
     public void setCalendarListener(MultiDayCalendarListener listener){

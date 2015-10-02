@@ -11,6 +11,8 @@ import com.github.sundeepk.multidaycalendarview.domain.Event;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -20,6 +22,8 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final MultiDayCalendarView multiDayCalendarView = (MultiDayCalendarView) findViewById(R.id.multiday_calendar_view);
+        multiDayCalendarView.goToDate(new Date(1443744000000L));
+        multiDayCalendarView.setTimeZoneAndLocale(TimeZone.getTimeZone("GMT"), Locale.getDefault());
         multiDayCalendarView.setCalendarListener(new MultiDayCalendarView.MultiDayCalendarListener() {
             @Override
             public void onNewEventCreate(long eventStartDateTime) {

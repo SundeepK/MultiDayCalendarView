@@ -22,8 +22,10 @@ import com.github.sundeepk.multidaycalendarview.domain.Event;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class MultiDayCalendarViewController implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
@@ -170,6 +172,14 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         this.distanceX = distanceX;
         this.distanceY = distanceY;
         return true;
+    }
+
+    public void setLocale(Locale locale){
+        currentCalendar = Calendar.getInstance(locale);
+    }
+
+    public void setTimeZoneAndLocale(TimeZone timeZone, Locale locale){
+        currentCalendar = new GregorianCalendar(timeZone, locale);
     }
 
     private void loadAttributes(AttributeSet attrs, Context context) {
