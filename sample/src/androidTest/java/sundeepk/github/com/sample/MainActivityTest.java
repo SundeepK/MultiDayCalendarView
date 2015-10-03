@@ -118,6 +118,26 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     }
 
 
+    @Test
+    public void testItRemovesEvent(){
+        final MultiDayCalendarView multiDayCalendarView = (MultiDayCalendarView) activity.findViewById(R.id.multiday_calendar_view);
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                multiDayCalendarView.addEvent(1443744000L, new Event<>("Some event", null, Color.parseColor("#43A047")));
+                assertTrue(multiDayCalendarView.containsEvent(1443744000L));
+
+                multiDayCalendarView.removeEvent(1443744000L);
+
+                assertFalse(multiDayCalendarView.containsEvent(1443744000L));
+            }
+        });
+
+    }
+
+
+
 
     public static ViewAction scroll(final int startX, final int startY, final int endX, final int endY){
         return new GeneralSwipeAction(
