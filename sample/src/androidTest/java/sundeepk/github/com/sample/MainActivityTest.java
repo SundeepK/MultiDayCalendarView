@@ -82,8 +82,6 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
     @Test
     public void testItScrollsRight(){
-        final MultiDayCalendarView multiDayCalendarView = (MultiDayCalendarView) activity.findViewById(R.id.multiday_calendar_view);
-
         //select first cell in calendar
         onView(ViewMatchers.withId(R.id.multiday_calendar_view)).perform(scroll(100, 100, -600, 0));
 
@@ -93,14 +91,32 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
     @Test
     public void testItScrollsLeft(){
-        final MultiDayCalendarView multiDayCalendarView = (MultiDayCalendarView) activity.findViewById(R.id.multiday_calendar_view);
-
         //select first cell in calendar
         onView(ViewMatchers.withId(R.id.multiday_calendar_view)).perform(scroll(100, 100, 600, 0));
 
         //Fri, 02 Oct 2015 00:00:00 GMT
         verify(multiDayCalendarListener).onCalendarScroll(new Date(1443571200000L));
     }
+
+    @Test
+    public void testItSetsHour(){
+        final MultiDayCalendarView multiDayCalendarView = (MultiDayCalendarView) activity.findViewById(R.id.multiday_calendar_view);
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                multiDayCalendarView.scrollTo(new Date(1443891600000L));
+            }
+        });
+
+        //select first cell in calendar
+        onView(ViewMatchers.withId(R.id.multiday_calendar_view)).perform(clickXY(300, 300));
+
+        //Fri, 02 Oct 2015 00:00:00 GMT
+        verify(multiDayCalendarListener).onNewEventCreate(1443891600L);
+    }
+
+
 
     public static ViewAction scroll(final int startX, final int startY, final int endX, final int endY){
         return new GeneralSwipeAction(

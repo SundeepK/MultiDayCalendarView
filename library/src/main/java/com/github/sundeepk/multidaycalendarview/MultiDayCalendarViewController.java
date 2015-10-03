@@ -41,6 +41,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     private static final int SWIPE_MIN_DISTANCE = 50;
     private static final int SWIPE_MAX_OFF_PATH = 50;
     private static final int SWIPE_THRESHOLD_VELOCITY = 100;
+    private static final int TIME_TEXT_SIZE = 25;
 
     private Paint timeColumnPaint;
     private Paint dayHourSeparatorPaint;
@@ -77,6 +78,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     private int eventRectTextHeight;
     private int eventTextSize = 13;
     private int dateHeaderTextSize = 14;
+    private boolean scrollHourNotSet;
 
     MultiDayCalendarViewController(Paint dayHourSeparatorPaint, Paint timeColumnPaint,
                                     TextPaint eventsPaint, OverScroller scroller, RectF helperRect,
@@ -232,6 +234,10 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         widthPerDay = parentWidth - timeTextWidth;
         widthPerDay = widthPerDay / numberOfVisibleDays;
         minYScrollAllowed = -(timeTextHeight * 24 + HEADER_HEIGHT - parentHeight);
+        if(scrollHourNotSet){
+            scrollTo(currentDate);
+            scrollHourNotSet = false;
+        }
     }
 
     protected void onDraw(Canvas canvas) {
@@ -304,7 +310,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
                 day++;
             }
             if (hour > 0) {
-                timeColumnPaint.setTextSize(25);
+                timeColumnPaint.setTextSize(TIME_TEXT_SIZE);
                 if (hour > 11) {
                     canvas.drawText(Integer.toString(hour) + "pm", 7, top, timeColumnPaint);
                 } else {
@@ -580,12 +586,24 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         return this.epochSecsToEvents.get(epochTimeInSecsToTheClosetHour) != null;
     }
 
-    void gotoDate(Date dateToGoTo){
-        currentDate = new Date(dateToGoTo.getTime());
+    void scrollTo(Date dateToGoTo){
+        currentDate.setTime(dateToGoTo.getTime());
         currentCalendar.setTime(currentDate);
         daysScrolledSoFar = 0;
         accumulatedScrollOffset.x = 0;
         distanceX = 0;
-    }
 
+        if (width <= 0 && height <= 0 ) {
+            scrollHourNotSet = true;
+            return;
+        }
+
+        int hour = currentCalendar.get(Calendar.HOUR_OF_DAY);
+        int offset =  -(hour * timeTextHeight) ;
+        if (offset <= (minYScrollAllowed)) {
+            accumulatedScrollOffset.y = minYScrollAllowed;
+        } else {
+            accumulatedScrollOffset.y = offset + (TIME_TEXT_SIZE / 2);
+        }
+    }
 }

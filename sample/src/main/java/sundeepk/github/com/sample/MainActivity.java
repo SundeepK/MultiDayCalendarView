@@ -22,7 +22,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final MultiDayCalendarView multiDayCalendarView = (MultiDayCalendarView) findViewById(R.id.multiday_calendar_view);
-        multiDayCalendarView.goToDate(new Date(1443744000000L));
+        multiDayCalendarView.scrollTo(new Date(1443744000000L));
         multiDayCalendarView.setTimeZoneAndLocale(TimeZone.getTimeZone("GMT"), Locale.getDefault());
         multiDayCalendarView.setCalendarListener(new MultiDayCalendarView.MultiDayCalendarListener() {
             @Override

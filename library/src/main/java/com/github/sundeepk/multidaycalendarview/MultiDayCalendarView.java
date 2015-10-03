@@ -58,6 +58,7 @@ public class MultiDayCalendarView extends View {
         }
     };
 
+
     public interface MultiDayCalendarListener {
        public void onNewEventCreate(long eventStartDateTime);
        public void onEventSelect(long eventStartDateTime, Event selectedEvent);
@@ -99,7 +100,12 @@ public class MultiDayCalendarView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        multiDayCalendarViewController.onMeasure(getWidth(), getHeight());
+        int width = MeasureSpec.getSize(widthMeasureSpec);
+        int height = MeasureSpec.getSize(heightMeasureSpec);
+        if(width > 0 && height > 0) {
+            multiDayCalendarViewController.onMeasure(width, height);
+        }
+        setMeasuredDimension(width, height);
     }
 
     @Override
@@ -150,8 +156,8 @@ public class MultiDayCalendarView extends View {
         return this.multiDayCalendarViewController.containsEvent(epochTimeInSecsToTheClosetHour);
     }
 
-    public void goToDate(Date dateToGoTo){
-        multiDayCalendarViewController.gotoDate(dateToGoTo);
+    public void scrollTo(Date dateToGoTo){
+        multiDayCalendarViewController.scrollTo(dateToGoTo);
         invalidate();
     }
 
