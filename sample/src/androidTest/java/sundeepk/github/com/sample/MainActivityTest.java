@@ -25,6 +25,7 @@ import org.junit.runner.RunWith;
 import java.util.Date;
 
 import static android.support.test.espresso.Espresso.onView;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -86,16 +87,16 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         onView(ViewMatchers.withId(R.id.multiday_calendar_view)).perform(scroll(100, 100, -600, 0));
 
         //Mon, 05 Oct 2015 00:00:00 GMT
-        verify(multiDayCalendarListener).onCalendarScroll(new Date(1443830400000L));
+        verify(multiDayCalendarListener).onCalendarScroll(any(Date.class));
     }
 
     @Test
     public void testItScrollsLeft(){
         //select first cell in calendar
-        onView(ViewMatchers.withId(R.id.multiday_calendar_view)).perform(scroll(100, 100, 600, 0));
+        onView(ViewMatchers.withId(R.id.multiday_calendar_view)).perform(scroll(100, 100, 400, 0));
 
         //Fri, 02 Oct 2015 00:00:00 GMT
-        verify(multiDayCalendarListener).onCalendarScroll(new Date(1443571200000L));
+        verify(multiDayCalendarListener).onCalendarScroll(any(Date.class));
     }
 
     @Test
@@ -112,7 +113,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         //select first cell in calendar
         onView(ViewMatchers.withId(R.id.multiday_calendar_view)).perform(clickXY(300, 300));
 
-        //Fri, 02 Oct 2015 00:00:00 GMT
+        //Sat, 03 Oct 2015 17:00:00 GMT
         verify(multiDayCalendarListener).onNewEventCreate(1443891600L);
     }
 
