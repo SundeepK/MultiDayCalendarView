@@ -10,17 +10,13 @@ import android.support.test.espresso.action.Press;
 import android.support.test.espresso.action.Swipe;
 import android.support.test.espresso.action.Tap;
 import android.support.test.espresso.matcher.ViewMatchers;
-import android.support.test.runner.AndroidJUnit4;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.suitebuilder.annotation.LargeTest;
 import android.view.View;
 
 import com.github.sundeepk.multidaycalendarview.MultiDayCalendarView;
 import com.github.sundeepk.multidaycalendarview.domain.Event;
 
 import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.util.Date;
 
@@ -29,11 +25,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-@RunWith(AndroidJUnit4.class)
-@LargeTest
 public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
-    MultiDayCalendarView.MultiDayCalendarListener multiDayCalendarListener;
+    private MultiDayCalendarView.MultiDayCalendarListener multiDayCalendarListener;
+    private MultiDayCalendarView multiDayCalendarView;
 
     private MainActivity activity;
 
@@ -47,13 +42,11 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         activity = getActivity();
         multiDayCalendarListener = mock(MultiDayCalendarView.MultiDayCalendarListener.class);
-
-        final MultiDayCalendarView multiDayCalendarView = (MultiDayCalendarView) activity.findViewById(R.id.multiday_calendar_view);
+        multiDayCalendarView = (MultiDayCalendarView) activity.findViewById(R.id.multiday_calendar_view);
         multiDayCalendarView.setCalendarListener(multiDayCalendarListener);
     }
 
-    @Test
-    public void testItOnNewEventIsCalled(){
+    public void testOnNewEventIsCalled(){
         //select first cell in calendar
         ViewAction clickOnCalendar = clickXY(300, 300);
         onView(ViewMatchers.withId(R.id.multiday_calendar_view)).perform(clickOnCalendar);
@@ -62,16 +55,8 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         verify(multiDayCalendarListener).onNewEventCreate(1443744000L);
     }
 
-    @Test
     public void testItSelectsEvent(){
-        final MultiDayCalendarView multiDayCalendarView = (MultiDayCalendarView) activity.findViewById(R.id.multiday_calendar_view);
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                multiDayCalendarView.addEvent(1443744000L, new Event<>("Some event", null, Color.parseColor("#43A047")));
-            }
-        });
+        givenCalendarHasEvent(1443744000L, new Event<>("Some event", null, Color.parseColor("#43A047")));
 
         //select first cell in calendar
         ViewAction clickOnCalendar = clickXY(300, 300);
@@ -81,7 +66,6 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         verify(multiDayCalendarListener).onEventSelect(1443744000L, new Event<>("Some event", null, Color.parseColor("#43A047")));
     }
 
-    @Test
     public void testItScrollsRight(){
         //select first cell in calendar
         onView(ViewMatchers.withId(R.id.multiday_calendar_view)).perform(scroll(100, 100, -600, 0));
@@ -90,7 +74,6 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         verify(multiDayCalendarListener).onCalendarScroll(any(Date.class));
     }
 
-    @Test
     public void testItScrollsLeft(){
         //select first cell in calendar
         onView(ViewMatchers.withId(R.id.multiday_calendar_view)).perform(scroll(100, 100, 400, 0));
@@ -99,16 +82,8 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         verify(multiDayCalendarListener).onCalendarScroll(any(Date.class));
     }
 
-    @Test
     public void testItSetsHour(){
-        final MultiDayCalendarView multiDayCalendarView = (MultiDayCalendarView) activity.findViewById(R.id.multiday_calendar_view);
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                multiDayCalendarView.scrollTo(new Date(1443891600000L));
-            }
-        });
+        givenCalendarIsScrolledTo(new Date(1443891600000L));
 
         //select first cell in calendar
         onView(ViewMatchers.withId(R.id.multiday_calendar_view)).perform(clickXY(300, 300));
@@ -118,26 +93,45 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     }
 
 
-    @Test
-    public void testItRemovesEvent(){
-        final MultiDayCalendarView multiDayCalendarView = (MultiDayCalendarView) activity.findViewById(R.id.multiday_calendar_view);
+    public void testItSetsDay(){
+        givenCalendarIsScrolledTo(new Date(1444492800000L));
 
-        activity.runOnUiThread(new Runnable() {
+        //Sat, 10 Oct 2015 00:00:00 GMT
+        assertEquals(new Date(1444435200000L), multiDayCalendarView.getCurrentLeftMostDay());
+    }
+
+    public void testItRemovesEvent(){
+        givenCalendarHasEvent(1443744000L, new Event<>("Some event", null, Color.parseColor("#43A047")));
+
+        assertTrue(multiDayCalendarView.containsEvent(1443744000L));
+
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
             @Override
             public void run() {
-                multiDayCalendarView.addEvent(1443744000L, new Event<>("Some event", null, Color.parseColor("#43A047")));
-                assertTrue(multiDayCalendarView.containsEvent(1443744000L));
-
                 multiDayCalendarView.removeEvent(1443744000L);
-
-                assertFalse(multiDayCalendarView.containsEvent(1443744000L));
             }
         });
 
+        assertFalse(multiDayCalendarView.containsEvent(1443744000L));
     }
 
+    private void givenCalendarIsScrolledTo(final Date date) {
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                multiDayCalendarView.scrollTo(date);
+            }
+        });
+    }
 
-
+    private void givenCalendarHasEvent(final long epochTime, final Event<?> objectEvent) {
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                multiDayCalendarView.addEvent(epochTime, objectEvent);
+            }
+        });
+    }
 
     public static ViewAction scroll(final int startX, final int startY, final int endX, final int endY){
         return new GeneralSwipeAction(
