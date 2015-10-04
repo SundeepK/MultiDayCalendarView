@@ -100,6 +100,13 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertEquals(new Date(1444435200000L), multiDayCalendarView.getCurrentLeftMostDay());
     }
 
+    public void testItSetsDayInThePast(){
+        givenCalendarIsScrolledTo(new Date(1410111870000L));
+
+        //Sun, 07 Sep 2014 00:00:00 GMT
+        assertEquals(new Date(1410048000000L), multiDayCalendarView.getCurrentLeftMostDay());
+    }
+
     public void testItRemovesEvent(){
         givenCalendarHasEvent(1443744000L, new Event<>("Some event", null, Color.parseColor("#43A047")));
 
@@ -186,7 +193,4 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
                 },
                 Press.FINGER);
     }
-
-
-
 }

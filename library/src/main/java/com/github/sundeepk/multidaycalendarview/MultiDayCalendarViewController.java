@@ -603,7 +603,10 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         if (offset <= (minYScrollAllowed)) {
             accumulatedScrollOffset.y = minYScrollAllowed;
         } else {
-            accumulatedScrollOffset.y = offset + (TIME_TEXT_SIZE / 2);
+            if(hour > 0){
+                offset = offset + (TIME_TEXT_SIZE / 2);
+            }
+            accumulatedScrollOffset.y = offset;
         }
     }
 }
