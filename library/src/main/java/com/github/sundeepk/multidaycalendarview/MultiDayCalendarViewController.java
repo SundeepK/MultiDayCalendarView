@@ -41,9 +41,8 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     private static final int SWIPE_MIN_DISTANCE = 50;
     private static final int SWIPE_MAX_OFF_PATH = 50;
     private static final int SWIPE_THRESHOLD_VELOCITY = 100;
-    private static final int TIME_TEXT_SIZE = 25;
-
     private Paint timeColumnPaint;
+
     private Paint dayHourSeparatorPaint;
     private TextPaint eventsPaint;
     private OverScroller scroller;
@@ -54,8 +53,11 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     private LongSparseArray<Event<?>> epochSecsToEvents = new LongSparseArray<>();
     private Rect timeColumnRect = new Rect();
     private MultiDayCalendarView.MultiDayCalendarListener multiDayCalendarListener;
-
     private int currentFlingDirection;
+
+    private int dayOfWeekTextSize = 15;
+    private int dayOfMonthTextSize = 23;
+    private int timeTextSize = 13;
     private int currentScrollDirection = NONE;
     private int timeTextWidth;
     private int timeTextHeight;
@@ -192,6 +194,9 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
                         (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, eventTextSize, context.getResources().getDisplayMetrics()));
                 dateHeaderTextSize = typedArray.getDimensionPixelSize(R.styleable.MultiDayCalendarView_multiDayCalendarDateHeaderTextSize,
                         (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, dateHeaderTextSize, context.getResources().getDisplayMetrics()));
+                timeTextSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, timeTextSize, context.getResources().getDisplayMetrics());
+                dayOfWeekTextSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, dayOfWeekTextSize, context.getResources().getDisplayMetrics());
+                dayOfMonthTextSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, dayOfMonthTextSize, context.getResources().getDisplayMetrics());
             }finally{
                 typedArray.recycle();
             }
@@ -302,15 +307,15 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
                 currentCalendar.setTime(currentDate);
                 plusDays(day);
                 Date date = currentCalendar.getTime();
-                timeColumnPaint.setTextSize(45);
+                timeColumnPaint.setTextSize(dayOfMonthTextSize);
                 canvas.drawText(Integer.toString(currentCalendar.get(Calendar.DAY_OF_MONTH)), dayXPos, headerTextTopPadding, timeColumnPaint);
-                timeColumnPaint.setTextSize(30);
+                timeColumnPaint.setTextSize(dayOfWeekTextSize);
                 canvas.drawText(currentCalendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, locale),
                         dayXPos, headerTextTopPadding + 35, timeColumnPaint);
                 day++;
             }
             if (hour > 0) {
-                timeColumnPaint.setTextSize(TIME_TEXT_SIZE);
+                timeColumnPaint.setTextSize(timeTextSize);
                 if (hour > 11) {
                     canvas.drawText(Integer.toString(hour) + "pm", 7, top, timeColumnPaint);
                 } else {
@@ -463,8 +468,8 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     private void drawEventText(Canvas canvas, int maxNumberOfLines, Event event, float dayX, float hourY) {
         dayX += 2;
         String eventText = event.getEventName();
-        int count =0;
-        int start =0;
+        int count = 0;
+        int start = 0;
         int heightOffset = 0;
         eventsPaint.setColor(Color.WHITE);
         // line wrap the text to draw
@@ -604,7 +609,7 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
             accumulatedScrollOffset.y = minYScrollAllowed;
         } else {
             if(hour > 0){
-                offset = offset + (TIME_TEXT_SIZE / 2);
+                offset = offset + (timeTextSize / 2);
             }
             accumulatedScrollOffset.y = offset;
         }
