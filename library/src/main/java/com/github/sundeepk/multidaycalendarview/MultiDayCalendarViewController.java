@@ -81,6 +81,8 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
     private int eventTextSize = 13;
     private int dateHeaderTextSize = 14;
     private boolean scrollHourNotSet;
+    private long currentlySelectedEventStartEpoch;
+    private int defaultEventRectSelectColor = Color.RED;
 
     MultiDayCalendarViewController(Paint dayHourSeparatorPaint, Paint timeColumnPaint,
                                     TextPaint eventsPaint, OverScroller scroller, RectF helperRect,
@@ -111,11 +113,12 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
             plusHoursAndDays(hour, day);
             long eventStartTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(currentCalendar.getTimeInMillis());
             Event<?> event = epochSecsToEvents.get(eventStartTimeSeconds);
-            if(event != null){
+            if(event != null && currentlySelectedEventStartEpoch == eventStartTimeSeconds){
                 multiDayCalendarListener.onEventSelect(eventStartTimeSeconds, event);
             }else{
                 multiDayCalendarListener.onNewEventCreate(eventStartTimeSeconds);
             }
+            currentlySelectedEventStartEpoch = eventStartTimeSeconds;
         }
         return true;
     }
@@ -462,6 +465,18 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
                 canvas.drawRoundRect(helperRect, 6, 6, eventsPaint);
                 drawEventText(canvas, maxNumberOfLines, event, helperRect.left, helperRect.top + (eventRectTextHeight + padding));
             }
+        }
+
+        if(currentlySelectedEventStartEpoch > 0){
+            float dayX = TIME_COLUMN_PADDING + accumulatedScrollOffset.x + widthPerDay * ((currentlySelectedEventStartEpoch / SECS_IN_DAY) + -tmpDaysScrolledSoFar);
+            float hour = Math.round(accumulatedScrollOffset.y + timeTextHeight * ((currentlySelectedEventStartEpoch / SECS_IN_HOUR) % 24) + HEADER_HEIGHT);
+            eventsPaint.setColor(event.getColor());
+            helperRect.left = dayX + EVENT_PADDING;
+            helperRect.top = hour;
+            helperRect.right = (dayX + widthPerDay - 1);
+            helperRect.bottom = (hour + timeTextHeight) - EVENT_PADDING;
+            canvas.drawRoundRect(helperRect, 6, 6, eventsPaint);
+            drawEventText(canvas, maxNumberOfLines, event, helperRect.left, helperRect.top + (eventRectTextHeight + padding));
         }
     }
 
