@@ -468,15 +468,20 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         }
 
         if(currentlySelectedEventStartEpoch > 0){
-            float dayX = TIME_COLUMN_PADDING + accumulatedScrollOffset.x + widthPerDay * ((currentlySelectedEventStartEpoch / SECS_IN_DAY) + -tmpDaysScrolledSoFar);
-            float hour = Math.round(accumulatedScrollOffset.y + timeTextHeight * ((currentlySelectedEventStartEpoch / SECS_IN_HOUR) % 24) + HEADER_HEIGHT);
-            eventsPaint.setColor(event.getColor());
+            long difference;
+            if (currentlySelectedEventStartEpoch > startTime) {
+                difference = (currentlySelectedEventStartEpoch - startTime);
+            } else {
+                difference = (startTime - currentlySelectedEventStartEpoch);
+            }
+            float dayX = TIME_COLUMN_PADDING + accumulatedScrollOffset.x + widthPerDay * ((difference / SECS_IN_DAY) + -tmpDaysScrolledSoFar);
+            float hour = Math.round(accumulatedScrollOffset.y + timeTextHeight * ((difference / SECS_IN_HOUR) % 24) + HEADER_HEIGHT);
+            eventsPaint.setColor(defaultEventRectSelectColor);
             helperRect.left = dayX + EVENT_PADDING;
             helperRect.top = hour;
             helperRect.right = (dayX + widthPerDay - 1);
             helperRect.bottom = (hour + timeTextHeight) - EVENT_PADDING;
             canvas.drawRoundRect(helperRect, 6, 6, eventsPaint);
-            drawEventText(canvas, maxNumberOfLines, event, helperRect.left, helperRect.top + (eventRectTextHeight + padding));
         }
     }
 
