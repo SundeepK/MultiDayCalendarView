@@ -113,11 +113,13 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
             plusHoursAndDays(hour, day);
             long eventStartTimeSeconds = TimeUnit.MILLISECONDS.toSeconds(currentCalendar.getTimeInMillis());
             Event<?> event = epochSecsToEvents.get(eventStartTimeSeconds);
-            if(event != null && currentlySelectedEventStartEpoch == eventStartTimeSeconds){
-                multiDayCalendarListener.onEventSelect(eventStartTimeSeconds, event);
-            }else{
-                multiDayCalendarListener.onNewEventCreate(eventStartTimeSeconds);
-            }
+                if(event != null){
+                    multiDayCalendarListener.onEventSelect(eventStartTimeSeconds, event);
+                }else{
+                    if(currentlySelectedEventStartEpoch == eventStartTimeSeconds){
+                        multiDayCalendarListener.onNewEventCreate(eventStartTimeSeconds);
+                    }
+               }
             currentlySelectedEventStartEpoch = eventStartTimeSeconds;
         }
         return true;
@@ -445,44 +447,35 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
         int maxNumberOfLines = (timeTextHeight / eventRectTextHeight) - 1; // minus 1 because we offset the drawing of text by eventRectTextHeight / 2
         int padding = eventRectTextHeight / 3;
 
+        if(currentlySelectedEventStartEpoch > 0 && currentlySelectedEventStartEpoch >= startTime && currentlySelectedEventStartEpoch <= endDate){
+            drawRect(canvas, currentlySelectedEventStartEpoch, tmpDaysScrolledSoFar, startTime, defaultEventRectSelectColor );
+        }
+
         for(int i = 0; i < epochSecsToEvents.size(); i++){
             long timeInSeconds = epochSecsToEvents.keyAt(i);
             if (timeInSeconds >= startTime && timeInSeconds <= endDate) {
                 Event event = epochSecsToEvents.valueAt(i);
-                long difference;
-                if (timeInSeconds > startTime) {
-                    difference = (timeInSeconds - startTime);
-                } else {
-                    difference = (startTime - timeInSeconds);
-                }
-                float dayX = TIME_COLUMN_PADDING + accumulatedScrollOffset.x + widthPerDay * ((difference / SECS_IN_DAY) + -tmpDaysScrolledSoFar);
-                float hour = Math.round(accumulatedScrollOffset.y + timeTextHeight * ((difference / SECS_IN_HOUR) % 24) + HEADER_HEIGHT);
-                eventsPaint.setColor(event.getColor());
-                helperRect.left = dayX + EVENT_PADDING;
-                helperRect.top = hour;
-                helperRect.right = (dayX + widthPerDay - 1);
-                helperRect.bottom = (hour + timeTextHeight) - EVENT_PADDING;
-                canvas.drawRoundRect(helperRect, 6, 6, eventsPaint);
+                drawRect(canvas, timeInSeconds, tmpDaysScrolledSoFar, startTime, event.getColor());
                 drawEventText(canvas, maxNumberOfLines, event, helperRect.left, helperRect.top + (eventRectTextHeight + padding));
             }
         }
+    }
 
-        if(currentlySelectedEventStartEpoch > 0){
-            long difference;
-            if (currentlySelectedEventStartEpoch > startTime) {
-                difference = (currentlySelectedEventStartEpoch - startTime);
-            } else {
-                difference = (startTime - currentlySelectedEventStartEpoch);
-            }
-            float dayX = TIME_COLUMN_PADDING + accumulatedScrollOffset.x + widthPerDay * ((difference / SECS_IN_DAY) + -tmpDaysScrolledSoFar);
-            float hour = Math.round(accumulatedScrollOffset.y + timeTextHeight * ((difference / SECS_IN_HOUR) % 24) + HEADER_HEIGHT);
-            eventsPaint.setColor(defaultEventRectSelectColor);
-            helperRect.left = dayX + EVENT_PADDING;
-            helperRect.top = hour;
-            helperRect.right = (dayX + widthPerDay - 1);
-            helperRect.bottom = (hour + timeTextHeight) - EVENT_PADDING;
-            canvas.drawRoundRect(helperRect, 6, 6, eventsPaint);
+    private void drawRect(Canvas canvas, long epochTime, int tmpDaysScrolledSoFar, long startTime, int color) {
+        long difference;
+        if (epochTime > startTime) {
+            difference = (epochTime - startTime);
+        } else {
+            difference = (startTime - epochTime);
         }
+        float dayX = TIME_COLUMN_PADDING + accumulatedScrollOffset.x + widthPerDay * ((difference / SECS_IN_DAY) + -tmpDaysScrolledSoFar);
+        float hour = Math.round(accumulatedScrollOffset.y + timeTextHeight * ((difference / SECS_IN_HOUR) % 24) + HEADER_HEIGHT);
+        eventsPaint.setColor(color);
+        helperRect.left = dayX + EVENT_PADDING;
+        helperRect.top = hour;
+        helperRect.right = (dayX + widthPerDay - 1);
+        helperRect.bottom = (hour + timeTextHeight) - EVENT_PADDING;
+        canvas.drawRoundRect(helperRect, 6, 6, eventsPaint);
     }
 
     private void drawEventText(Canvas canvas, int maxNumberOfLines, Event event, float dayX, float hourY) {
