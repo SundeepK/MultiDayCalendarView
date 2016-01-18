@@ -494,17 +494,20 @@ public class MultiDayCalendarViewController implements GestureDetector.OnGesture
                 break;
             }
 
-            int startOfCurrentWord =  getStartOfWordPos(eventText, start + end);
+            int startOfCurrentWord = getStartOfWordPos(eventText, start + end);
             int endOfCurrentWord = getEndOfWordPos(eventText, start + end);
 
 
-            while(eventText.charAt(start) == ' '){
+            while (eventText.charAt(start) == ' ') {
                 start++;
             }
 
-            if (endOfCurrentWord >= (start + end) &&  startOfCurrentWord > start ) {
+            if (endOfCurrentWord >= (start + end) && startOfCurrentWord > start) {
                 canvas.drawText(eventText, start, startOfCurrentWord, dayX, hourY + heightOffset, eventsPaint);
                 start = startOfCurrentWord;
+            } else if (start + end > eventText.length()) {
+                canvas.drawText(eventText, start, eventText.length(), dayX, hourY + heightOffset, eventsPaint);
+                break;
             } else {
                 canvas.drawText(eventText, start, start + end, dayX, hourY + heightOffset, eventsPaint);
                 start = start + end;
