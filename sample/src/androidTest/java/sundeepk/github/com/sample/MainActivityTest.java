@@ -44,23 +44,29 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         multiDayCalendarListener = mock(MultiDayCalendarView.MultiDayCalendarListener.class);
         multiDayCalendarView = (MultiDayCalendarView) activity.findViewById(R.id.multiday_calendar_view);
         multiDayCalendarView.setCalendarListener(multiDayCalendarListener);
+
     }
 
-    public void testOnNewEventIsCalled(){
-        //select first cell in calendar
+    public void testOnNewEventIsCalled() throws Exception {
+        //select first cell in calendar, then click
         ViewAction clickOnCalendar = clickXY(300, 300);
         onView(ViewMatchers.withId(R.id.multiday_calendar_view)).perform(clickOnCalendar);
+        Thread.sleep(1500);
+
+        onView(ViewMatchers.withId(R.id.multiday_calendar_view)).perform(clickOnCalendar);
+        Thread.sleep(1500);
 
         //Fri, 02 Oct 2015 00:00:00 GMT
         verify(multiDayCalendarListener).onNewEventCreate(1443744000L);
     }
 
-    public void testItSelectsEvent(){
+    public void testItSelectsEvent() throws Exception{
         givenCalendarHasEvent(1443744000L, new Event<>("Some event", null, Color.parseColor("#43A047")));
 
         //select first cell in calendar
         ViewAction clickOnCalendar = clickXY(300, 300);
         onView(ViewMatchers.withId(R.id.multiday_calendar_view)).perform(clickOnCalendar);
+        Thread.sleep(1500);
 
         //Fri, 02 Oct 2015 00:00:00 GMT
         verify(multiDayCalendarListener).onEventSelect(1443744000L, new Event<>("Some event", null, Color.parseColor("#43A047")));
@@ -82,14 +88,19 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         verify(multiDayCalendarListener).onCalendarScroll(any(Date.class));
     }
 
-    public void testItSetsHour(){
-        givenCalendarIsScrolledTo(new Date(1443891600000L));
+    public void testItSetsHour() throws Exception{
+        givenCalendarIsScrolledTo(new Date(1453122000000L));
 
         //select first cell in calendar
+        //first select cell and then click again to confirm
         onView(ViewMatchers.withId(R.id.multiday_calendar_view)).perform(clickXY(300, 300));
+        Thread.sleep(1500);
+
+        onView(ViewMatchers.withId(R.id.multiday_calendar_view)).perform(clickXY(300, 300));
+        Thread.sleep(1500);
 
         //Sat, 03 Oct 2015 17:00:00 GMT
-        verify(multiDayCalendarListener).onNewEventCreate(1443891600L);
+        verify(multiDayCalendarListener).onNewEventCreate(1453122000L);
     }
 
 
@@ -191,6 +202,6 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
                         return coordinates;
                     }
                 },
-                Press.FINGER);
+                Press.THUMB);
     }
 }

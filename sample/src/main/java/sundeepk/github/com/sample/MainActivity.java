@@ -3,6 +3,7 @@ package sundeepk.github.com.sample;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -27,12 +28,13 @@ public class MainActivity extends ActionBarActivity {
         multiDayCalendarView.setCalendarListener(new MultiDayCalendarView.MultiDayCalendarListener() {
             @Override
             public void onNewEventCreate(long eventStartDateTime) {
+                Log.d("MainActivity", "onNewEventCreate " + eventStartDateTime);
                 multiDayCalendarView.addEvent(eventStartDateTime, new Event<>("Some awesome thiiiiiiiiiinnngfffffffffff event name cool story bro", "some data to hold", Color.parseColor("#43A047")));
             }
 
             @Override
             public void onEventSelect(long eventStartDateTime, Event selectedEvent) {
-
+                Log.d("MainActivity", "Item selected " + selectedEvent);
             }
 
             @Override
